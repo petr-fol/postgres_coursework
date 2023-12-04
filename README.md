@@ -1,1 +1,1 @@
-# postgres_homework
+# postgres_coursework
