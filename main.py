@@ -1,3 +1,5 @@
+import json
+
 from db_manager import DBManager
 from companies import companies_data
 
@@ -9,7 +11,7 @@ def load_companies_to_db():
 
 def load_vacancies_to_db(vacancies_data):
     # Загружаем компании, если их еще нет в базе
-    load_companies_to_db()
+    # load_companies_to_db()
 
     for vacancy in vacancies_data:
         employer_id = vacancy.get("employer").get("id")
@@ -52,8 +54,10 @@ def check_and_load_data():
 
 
 def main():
-    json_file = "vacancies_data.json"
-    load_vacancies_to_db(json_file)
+    json_file_name = "vacancies_data.json"
+    with open( json_file_name, "r", encoding="utf-8") as f:
+        json_file_data = json.load(f)
+    load_vacancies_to_db(json_file_data)
     check_and_load_data()
 
     while True:

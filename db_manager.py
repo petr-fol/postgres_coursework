@@ -5,6 +5,13 @@ from psycopg2 import sql
 
 class DBManager:
     SQL_QUERIES = {
+        "get_company_id_by_employer_id": """
+            SELECT id FROM companies WHERE employer_id = %s;
+        """,
+
+        "get_company_id_by_id": """
+            SELECT id FROM companies WHERE id = %s;
+        """,
         "create_companies_table": """
             CREATE TABLE IF NOT EXISTS companies (
                 id SERIAL PRIMARY KEY,
@@ -186,6 +193,24 @@ class DBManager:
         with cls._get_connection() as conn:
             cursor = conn.cursor()
 
-            # Используем параметры запроса для безопасной вставки значений
-            query = "INSERT INTO companies (name, id) VALUES (%s, %s);"
-            cursor.execute(query, (company_name, str(company_id)))
+            # Проверяем, существует ли компания с указанным id
+            existing_company_id = cls.get_company_id_by_id(company_id)
+
+            if not existing_company_id:
+                # Если компании с таким id нет, добавляем новую
+                query = sql.SQL("INSERT INTO companies (name, id) VALUES ({}, {});").format(
+                    sql.Identifier(company_name),
+                    sql.Identifier(str(company_id))
+                )
+                cursor.execute(query)
+            else:
+                # Если компания существует, ничего не делаем
+                pass
+
+    @classmethod
+    def get_company_id_by_id(cls, company_id):
+        with cls._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(cls.SQL_QUERIES["get_company_id_by_id"], (company_id,))
+            result = cursor.fetchone()
+            return result[0] if result else None
