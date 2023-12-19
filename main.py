@@ -2,6 +2,7 @@ import json
 
 from db_manager import DBManager
 from companies import companies_data
+from hh_handler import get_vacancies_from_companies
 
 
 def load_companies_to_db():
@@ -54,9 +55,11 @@ def check_and_load_data():
 
 
 def main():
-    json_file_name = "vacancies_data.json"
-    with open( json_file_name, "r", encoding="utf-8") as f:
-        json_file_data = json.load(f)
+
+    # json_file_name = "vacancies_data.json"
+    # with open( json_file_name, "r", encoding="utf-8") as f:
+    #     json_file_data = json.load(f)
+    json_file_data = get_vacancies_from_companies()
     load_vacancies_to_db(json_file_data)
     check_and_load_data()
 

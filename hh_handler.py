@@ -30,10 +30,10 @@ def get_vacancies_from_companies():
             vacancies_data.extend(data['items'])
         else:
             print(f"Ошибка при запросе данных для компании с ID {company_id}. Статус код: {response.status_code}")
-
+    return vacancies_data
     # Сохраняем данные в файл
-    with open('vacancies_data.json', 'w', encoding='utf-8') as file:
-        json.dump(vacancies_data, file, ensure_ascii=False, indent=2)
+    # with open('vacancies_data.json', 'w', encoding='utf-8') as file:
+    #     json.dump(vacancies_data, file, ensure_ascii=False, indent=2)
 
 
 def get_company_id_by_name(company_name):

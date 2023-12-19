@@ -1,64 +1,10 @@
 import psycopg2
 import os
 from psycopg2 import sql
+from sql_queries import SQL_QUERIES
 
 
 class DBManager:
-    SQL_QUERIES = {
-        "get_company_id_by_employer_id": """
-            SELECT id FROM companies WHERE employer_id = %s;
-        """,
-
-        "get_company_id_by_id": """
-            SELECT id FROM companies WHERE id = %s;
-        """,
-        "create_companies_table": """
-            CREATE TABLE IF NOT EXISTS companies (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(255) NOT NULL
-            );
-        """,
-        "create_vacancies_table": """
-            CREATE TABLE IF NOT EXISTS vacancies (
-                id SERIAL PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                salary NUMERIC,
-                company_id INTEGER REFERENCES companies(id)
-            );
-        """,
-        "insert_company": """
-            INSERT INTO companies (name) VALUES (%s) RETURNING id;
-        """,
-        "insert_vacancy": """
-            INSERT INTO vacancies (title, salary, company_id) VALUES (%s, %s, %s);
-        """,
-        "get_companies_and_vacancies_count": """
-            SELECT companies.name, COUNT(vacancies.id)
-            FROM companies
-            LEFT JOIN vacancies ON companies.id = vacancies.company_id
-            GROUP BY companies.name;
-        """,
-        "get_all_vacancies": """
-            SELECT companies.name, vacancies.title, vacancies.salary
-            FROM vacancies
-            JOIN companies ON vacancies.company_id = companies.id;
-        """,
-        "get_avg_salary": """
-            SELECT AVG(salary) FROM vacancies WHERE salary IS NOT NULL;
-        """,
-        "get_vacancies_with_higher_salary": """
-            SELECT companies.name, vacancies.title, vacancies.salary
-            FROM vacancies
-            JOIN companies ON vacancies.company_id = companies.id
-            WHERE vacancies.salary > %s;
-        """,
-        "get_vacancies_with_keyword": """
-            SELECT companies.name, vacancies.title, vacancies.salary
-            FROM vacancies
-            JOIN companies ON vacancies.company_id = companies.id
-            WHERE LOWER(vacancies.title) LIKE %s;
-        """
-    }
 
     @classmethod
     def _get_connection(cls):
@@ -78,8 +24,8 @@ class DBManager:
             cursor = conn.cursor()
 
             # Выполнение SQL-запросов
-            cursor.execute(cls.SQL_QUERIES["create_companies_table"])
-            cursor.execute(cls.SQL_QUERIES["create_vacancies_table"])
+            cursor.execute(SQL_QUERIES["create_companies_table"])
+            cursor.execute(SQL_QUERIES["create_vacancies_table"])
 
             # Фиксация изменений
 
@@ -90,7 +36,7 @@ class DBManager:
             cursor = conn.cursor()
 
             # Выполнение SQL-запроса
-            cursor.execute(cls.SQL_QUERIES["insert_company"], (company_name,))
+            cursor.execute(SQL_QUERIES["insert_company"], (company_name,))
 
             # Получение ID вставленной компании
 
@@ -103,7 +49,7 @@ class DBManager:
             cursor = conn.cursor()
 
             # Выполнение SQL-запроса
-            cursor.execute(cls.SQL_QUERIES["insert_vacancy"], (title, salary, company_id))
+            cursor.execute(SQL_QUERIES["insert_vacancy"], (title, salary, company_id))
 
             # Фиксация изменений
 
@@ -113,7 +59,7 @@ class DBManager:
         with cls._get_connection() as conn:
             cursor = conn.cursor()
 
-            cursor.execute(cls.SQL_QUERIES["get_companies_and_vacancies_count"])
+            cursor.execute(SQL_QUERIES["get_companies_and_vacancies_count"])
             results = cursor.fetchall()
 
             return results
@@ -124,7 +70,7 @@ class DBManager:
         with cls._get_connection() as conn:
             cursor = conn.cursor()
 
-            cursor.execute(cls.SQL_QUERIES["get_all_vacancies"])
+            cursor.execute(SQL_QUERIES["get_all_vacancies"])
             results = cursor.fetchall()
 
             return results
@@ -135,7 +81,7 @@ class DBManager:
         with cls._get_connection() as conn:
             cursor = conn.cursor()
 
-            cursor.execute(cls.SQL_QUERIES["get_avg_salary"])
+            cursor.execute(SQL_QUERIES["get_avg_salary"])
             avg_salary = cursor.fetchone()[0]
 
             return avg_salary
@@ -148,7 +94,7 @@ class DBManager:
 
             avg_salary = cls.get_avg_salary()
 
-            cursor.execute(cls.SQL_QUERIES["get_vacancies_with_higher_salary"], (avg_salary,))
+            cursor.execute(SQL_QUERIES["get_vacancies_with_higher_salary"], (avg_salary,))
             results = cursor.fetchall()
 
             return results
@@ -159,7 +105,7 @@ class DBManager:
         with cls._get_connection() as conn:
             cursor = conn.cursor()
 
-            cursor.execute(cls.SQL_QUERIES["get_vacancies_with_keyword"], ('%' + keyword.lower() + '%',))
+            cursor.execute(SQL_QUERIES["get_vacancies_with_keyword"], ('%' + keyword.lower() + '%',))
             results = cursor.fetchall()
 
             return results
@@ -211,6 +157,6 @@ class DBManager:
     def get_company_id_by_id(cls, company_id):
         with cls._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute(cls.SQL_QUERIES["get_company_id_by_id"], (company_id,))
+            cursor.execute(SQL_QUERIES["get_company_id_by_id"], (company_id,))
             result = cursor.fetchone()
             return result[0] if result else None
