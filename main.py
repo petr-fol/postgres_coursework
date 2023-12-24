@@ -37,6 +37,7 @@ def print_menu():
     print("3. Получить среднюю зарплату по вакансиям")
     print("4. Получить список вакансий с зарплатой выше средней")
     print("5. Получить список вакансий по ключевому слову")
+    print("6. Создать структуру базы данных")
     print("0. Выйти")
 
 
@@ -94,6 +95,9 @@ def main():
             print(f"Список вакансий с ключевым словом '{keyword}':")
             for company, title, salary in vacancies_with_keyword:
                 print(f"Компания: {company}, Вакансия: {title}, Зарплата: {salary}")
+        elif choice == "6":
+            DBManager.create_database_structure()
+            print("Структура базы данных успешно создана.")
         else:
             print("Неверный выбор. Пожалуйста, введите корректное значение.")
 
