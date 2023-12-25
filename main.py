@@ -38,6 +38,7 @@ def print_menu():
     print("4. Получить список вакансий с зарплатой выше средней")
     print("5. Получить список вакансий по ключевому слову")
     print("6. Создать структуру базы данных")
+    print("7. Загрузить данные в базу")
     print("0. Выйти")
 
 
@@ -49,20 +50,8 @@ def check_and_load_data():
         for company_name, company_id in companies_data:
             DBManager.insert_company(company_name)
 
-        # Загружаем данные вакансий
-        # (пример: загружаем вакансии для первой компании)
-        # DBManager.insert_vacancy("Software Engineer", 80000, 1)
-        # DBManager.insert_vacancy("Data Analyst", 70000, 1)
-
 
 def main():
-
-    # json_file_name = "vacancies_data.json"
-    # with open( json_file_name, "r", encoding="utf-8") as f:
-    #     json_file_data = json.load(f)
-    json_file_data = get_vacancies_from_companies()
-    load_vacancies_to_db(json_file_data)
-    check_and_load_data()
 
     while True:
         print_menu()
@@ -98,6 +87,11 @@ def main():
         elif choice == "6":
             DBManager.create_database_structure()
             print("Структура базы данных успешно создана.")
+        elif choice == "7":
+            check_and_load_data()
+            json_file_data = get_vacancies_from_companies()
+            load_vacancies_to_db(json_file_data)
+            print("Данные успешно загружены.")
         else:
             print("Неверный выбор. Пожалуйста, введите корректное значение.")
 
