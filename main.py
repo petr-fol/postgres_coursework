@@ -88,6 +88,7 @@ def main():
             DBManager.create_database_structure()
             print("Структура базы данных успешно создана.")
         elif choice == "7":
+            print("Выполняется . . .")
             check_and_load_data()
             json_file_data = get_vacancies_from_companies()
             load_vacancies_to_db(json_file_data)
