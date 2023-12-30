@@ -2,6 +2,7 @@ import psycopg2
 import os
 from psycopg2 import sql
 from sql_queries import SQL_QUERIES
+# from companies import companies
 
 
 class DBManager:
@@ -140,18 +141,11 @@ class DBManager:
             cursor = conn.cursor()
 
             # Проверяем, существует ли компания с указанным id
-            existing_company_id = cls.get_company_id_by_id(company_id)
-
-            if not existing_company_id:
-                # Если компании с таким id нет, добавляем новую
-                query = sql.SQL("INSERT INTO companies (name, id) VALUES ({}, {});").format(
-                    sql.Identifier(company_name),
-                    sql.Identifier(str(company_id))
-                )
-                cursor.execute(query)
-            else:
-                # Если компания существует, ничего не делаем
-                pass
+            # existing_company_id = cls.get_company_id_by_id(company_id)
+        # for company in companies:
+            # Если компании с таким id нет, добавляем новую
+            query = sql.SQL("INSERT INTO companies (id, name) VALUES (%s, %s)")
+            cursor.execute(query, (company_id, company_name))
 
     @classmethod
     def get_company_id_by_id(cls, company_id):

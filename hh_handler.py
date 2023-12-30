@@ -1,6 +1,6 @@
-from db_manager import DBManager
+# from db_manager import DBManager
+# import json
 import requests
-import json
 
 
 def get_vacancies_from_companies():

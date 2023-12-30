@@ -1,12 +1,10 @@
-import json
-
 from db_manager import DBManager
-from companies import companies_data
+from companies import companies
 from hh_handler import get_vacancies_from_companies
 
 
 def load_companies_to_db():
-    for company_name, company_id in companies_data:
+    for company_name, company_id in companies.items():
         DBManager.insert_company_with_id(company_name, company_id)
 
 
@@ -25,9 +23,16 @@ def load_vacancies_to_db(vacancies_data):
             print(f"Не найден идентификатор для компании с employer_id {employer_id}")
             continue
 
-        # Добавляем вакансию
         title = vacancy["name"]
-        salary = vacancy["salary"]["to"] if vacancy["salary"] and vacancy["salary"]["to"] else None
+
+        if vacancy["salary"] and vacancy["salary"]["from"] is not None:
+            salary = vacancy["salary"]["from"]
+        elif vacancy["salary"] and vacancy["salary"]["to"] is not None:
+            salary = vacancy["salary"]["to"]
+        else:
+            salary = None
+
+        # Добавляем вакансию
         DBManager.insert_vacancy(title, salary, company_id)
 
 
@@ -38,17 +43,9 @@ def print_menu():
     print("4. Получить список вакансий с зарплатой выше средней")
     print("5. Получить список вакансий по ключевому слову")
     print("6. Создать структуру базы данных")
-    print("7. Загрузить данные в базу")
+    print("7. Загрузить вакансии в базу")
+    print("8. загрузить компании в базу")
     print("0. Выйти")
-
-
-def check_and_load_data():
-    # Проверяем наличие данных в компаниях
-    if not DBManager.get_companies_and_vacancies_count():
-        # Если данных нет, загружаем их
-
-        for company_name, company_id in companies_data:
-            DBManager.insert_company(company_name)
 
 
 def main():
@@ -72,7 +69,7 @@ def main():
                 print(f"Компания: {company}, Вакансия: {title}, Зарплата: {salary}")
         elif choice == "3":
             avg_salary = DBManager.get_avg_salary()
-            print(f"Средняя зарплата по вакансиям: {avg_salary}")
+            print(f"Средняя зарплата по вакансиям: {int(avg_salary)} рублей")
         elif choice == "4":
             vacancies_with_higher_salary = DBManager.get_vacancies_with_higher_salary()
             print("Список вакансий с зарплатой выше средней:")
@@ -89,10 +86,13 @@ def main():
             print("Структура базы данных успешно создана.")
         elif choice == "7":
             print("Выполняется . . .")
-            check_and_load_data()
             json_file_data = get_vacancies_from_companies()
             load_vacancies_to_db(json_file_data)
-            print("Данные успешно загружены.")
+            print("Вакансии успешно загружены.")
+        elif choice == "8":
+            print("Выполняется . . .")
+            load_companies_to_db()
+            print("Компании успешно загружены.")
         else:
             print("Неверный выбор. Пожалуйста, введите корректное значение.")
 
